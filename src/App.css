@@ -1,0 +1,71 @@
+.site-layout {
+  padding: 0 24px;
+  background: #f0f2f5;
+}
+
+.site-content {
+  margin: 24px 16px;
+  padding: 24px;
+  background: #fff;
+  min-height: 280px;
+  border-radius: 4px;
+}
+
+.header-logo {
+  float: left;
+  height: 31px;
+  margin: 16px 24px 16px 0;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.header-menu {
+  float: right;
+}
+
+.currency-card {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+
+.currency-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.trend-up {
+  color: #52c41a;
+}
+
+.trend-down {
+  color: #f5222d;
+}
+
+.chart-container {
+  height: 300px;
+  width: 100%;
+}
+
+.alert-badge {
+  margin-left: 8px;
+}
+
+@media (max-width: 768px) {
+  .site-layout {
+    padding: 0 8px;
+  }
+  
+  .site-content {
+    margin: 16px 8px;
+    padding: 16px;
+  }
+  
+  .chart-container {
+    height: 200px;
+  }
+}
