@@ -12,6 +12,20 @@
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>汇率监控平台</title>
+    <!-- GitHub Pages SPA支持的重定向脚本 -->
+    <script type="text/javascript">
+      // 处理GitHub Pages的单页应用路由问题
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
   </head>
   <body>
     <noscript>您需要启用JavaScript来运行此应用。</noscript>

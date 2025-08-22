@@ -50,7 +50,28 @@ npm start
 
 # 构建生产版本
 npm run build
+
+# 部署到GitHub Pages
+npm run deploy
 ```
+
+## 部署
+
+项目通过GitHub Pages部署，访问地址：https://[您的GitHub用户名].github.io/currency.github.io/
+
+### 部署步骤
+
+1. 确保已安装gh-pages包：
+```bash
+npm install --save-dev gh-pages
+```
+
+2. 使用以下命令部署到GitHub Pages：
+```bash
+npm run deploy
+```
+
+3. 或者，推送代码到main分支，GitHub Actions会自动部署
 
 
 ## 后端API接口
