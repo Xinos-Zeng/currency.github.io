@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Typography, Spin, Card } from 'antd';
+import { Row, Col, Typography, Spin } from 'antd';
 import CurrencySelector from '../components/exchange/CurrencySelector';
 import CurrencyTrendChart from '../components/exchange/CurrencyTrendChart';
 import TrendAnalysisPanel from '../components/analysis/TrendAnalysisPanel';

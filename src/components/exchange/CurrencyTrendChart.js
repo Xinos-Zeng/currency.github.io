@@ -8,7 +8,6 @@ import {
   Tooltip, 
   ResponsiveContainer,
   ReferenceLine,
-  ReferenceArea
 } from 'recharts';
 import { Card, Spin } from 'antd';
 import moment from 'moment';
