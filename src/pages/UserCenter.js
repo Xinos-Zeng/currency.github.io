@@ -9,9 +9,12 @@ import {
   Form,
   Input,
   message,
-  Tabs
+  Tabs,
+  Select
 } from 'antd';
-import { UserOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons';
+import { UserOutlined, EditOutlined, SaveOutlined, LockOutlined } from '@ant-design/icons';
+import { userApi } from '../services/api';
+import universities from '../data/universities';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -20,10 +23,12 @@ const UserCenter = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
   const [form] = Form.useForm();
+  const [passwordForm] = Form.useForm();
   const navigate = useNavigate();
   
-  // 检查用户是否已登录
+  // 检查用户是否已登录并获取最新用户信息
   useEffect(() => {
     const userInfo = localStorage.getItem('userInfo');
     if (!userInfo) {
@@ -32,8 +37,30 @@ const UserCenter = () => {
       return;
     }
     
-    setUser(JSON.parse(userInfo));
-    setLoading(false);
+    const parsedUserInfo = JSON.parse(userInfo);
+    setLoading(true);
+    
+    // 从后端获取最新的用户信息
+    userApi.getUserInfo()
+      .then(userData => {
+        // 更新用户信息，包括正确的created_at时间戳
+        const updatedUserInfo = {
+          ...parsedUserInfo,
+          ...userData,
+        };
+        
+        // 更新本地存储
+        localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
+        setUser(updatedUserInfo);
+      })
+      .catch(error => {
+        console.error('获取用户信息失败:', error);
+        // 如果获取失败，仍然使用本地存储的信息
+        setUser(parsedUserInfo);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [navigate]);
   
   // 初始化表单值
@@ -42,8 +69,7 @@ const UserCenter = () => {
       form.setFieldsValue({
         username: user.username,
         email: user.email,
-        nickname: user.nickname || '',
-        phone: user.phone || ''
+        university: user.university || ''
       });
     }
   }, [user, form]);
@@ -56,11 +82,11 @@ const UserCenter = () => {
     try {
       setLoading(true);
       
-      // 这里将调用后端API更新用户信息
-      // const response = await updateUserProfile(values);
-      
-      // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // 调用后端API更新用户信息
+      await userApi.updateUserInfo({
+        email: values.email,
+        university: values.university
+      });
       
       // 更新本地存储的用户信息
       const updatedUser = { ...user, ...values };
@@ -70,10 +96,40 @@ const UserCenter = () => {
       message.success('个人信息更新成功');
       setEditing(false);
     } catch (error) {
-      message.error('更新失败，请重试');
+      if (error.response && error.response.data) {
+        message.error(`更新失败: ${error.response.data.detail || '请重试'}`);
+      } else {
+        message.error('更新失败，请检查网络连接');
+      }
       console.error('更新用户信息失败:', error);
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const handleChangePassword = async (values) => {
+    try {
+      setPasswordLoading(true);
+      
+      // 调用后端API修改密码
+      await userApi.changePassword(values.oldPassword, values.newPassword);
+      
+      message.success('密码修改成功');
+      passwordForm.resetFields();
+    } catch (error) {
+      if (error.response && error.response.data) {
+        message.error(`修改密码失败: ${error.response.data.detail || '请重试'}`);
+        
+        // 特殊处理旧密码错误的情况
+        if (error.response.status === 400 && error.response.data.detail.includes('旧密码不正确')) {
+          message.warning('旧密码不正确，请重新输入');
+        }
+      } else {
+        message.error('修改密码失败，请检查网络连接');
+      }
+      console.error('修改密码失败:', error);
+    } finally {
+      setPasswordLoading(false);
     }
   };
   
@@ -101,10 +157,10 @@ const UserCenter = () => {
                 <Descriptions bordered column={{ xs: 1, sm: 2 }}>
                   <Descriptions.Item label="用户名">{user?.username}</Descriptions.Item>
                   <Descriptions.Item label="邮箱">{user?.email}</Descriptions.Item>
-                  <Descriptions.Item label="昵称">{user?.nickname || '未设置'}</Descriptions.Item>
-                  <Descriptions.Item label="手机号">{user?.phone || '未设置'}</Descriptions.Item>
-                  <Descriptions.Item label="注册时间">{user?.registerTime || '2023-04-01'}</Descriptions.Item>
-                  <Descriptions.Item label="上次登录">{user?.lastLogin || '2023-05-01'}</Descriptions.Item>
+                  <Descriptions.Item label="学校">{user?.university || '未设置'}</Descriptions.Item>
+                  <Descriptions.Item label="注册时间">
+                    {user?.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}
+                  </Descriptions.Item>
                 </Descriptions>
                 
                 <Button 
@@ -124,8 +180,7 @@ const UserCenter = () => {
                 initialValues={{
                   username: user?.username,
                   email: user?.email,
-                  nickname: user?.nickname || '',
-                  phone: user?.phone || ''
+                  university: user?.university || ''
                 }}
               >
                 <Form.Item
@@ -148,20 +203,19 @@ const UserCenter = () => {
                 </Form.Item>
                 
                 <Form.Item
-                  name="nickname"
-                  label="昵称"
+                  name="university"
+                  label="学校"
                 >
-                  <Input placeholder="请输入昵称" />
-                </Form.Item>
-                
-                <Form.Item
-                  name="phone"
-                  label="手机号"
-                  rules={[
-                    { pattern: /^1[3-9]\d{9}$/, message: '请输入有效的手机号码', validateTrigger: 'onBlur' }
-                  ]}
-                >
-                  <Input placeholder="请输入手机号" />
+                  <Select
+                    showSearch
+                    placeholder="选择你的学校"
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                    }
+                    options={universities}
+                    allowClear
+                  />
                 </Form.Item>
                 
                 <Form.Item>
@@ -185,7 +239,11 @@ const UserCenter = () => {
         
         <TabPane tab="修改密码" key="password">
           <Card>
-            <Form layout="vertical">
+            <Form 
+              layout="vertical" 
+              onFinish={handleChangePassword}
+              name="passwordForm"
+            >
               <Form.Item
                 name="oldPassword"
                 label="当前密码"
@@ -225,7 +283,12 @@ const UserCenter = () => {
               </Form.Item>
               
               <Form.Item>
-                <Button type="primary">
+                <Button 
+                  type="primary" 
+                  htmlType="submit" 
+                  icon={<LockOutlined />}
+                  loading={passwordLoading}
+                >
                   修改密码
                 </Button>
               </Form.Item>

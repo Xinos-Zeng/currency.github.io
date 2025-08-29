@@ -2,9 +2,12 @@ import axios from 'axios';
 
 // 创建axios实例
 const api = axios.create({
-  // 在实际环境中替换为真实的API地址
-  baseURL: 'https://api.example.com/v1',
-  timeout: 10000
+  // 后端API地址
+  baseURL: 'http://localhost:8000/v1',
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
 // 请求拦截器
@@ -13,9 +16,16 @@ api.interceptors.request.use(
     // 从localStorage获取token
     const userInfo = localStorage.getItem('userInfo');
     if (userInfo) {
-      const { token } = JSON.parse(userInfo);
-      if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
+      try {
+        const parsedInfo = JSON.parse(userInfo);
+        if (parsedInfo.token) {
+          // 按照后端要求的格式添加Authorization头
+          config.headers['Authorization'] = `Bearer ${parsedInfo.token}`;
+        }
+      } catch (error) {
+        console.error('解析用户信息失败:', error);
+        // 清除无效的用户信息
+        localStorage.removeItem('userInfo');
       }
     }
     return config;
@@ -92,7 +102,10 @@ export const userApi = {
   
   // 修改密码
   changePassword: (oldPassword, newPassword) => {
-    return api.put('/user/password', { oldPassword, newPassword });
+    return api.put('/user/password', { 
+      old_password: oldPassword, 
+      new_password: newPassword 
+    });
   }
 };
 
@@ -101,6 +114,11 @@ export const alertApi = {
   // 获取用户所有提醒
   getUserAlerts: () => {
     return api.get('/alerts');
+  },
+  
+  // 获取单个提醒详情
+  getAlert: (alertId) => {
+    return api.get(`/alerts/${alertId}`);
   },
   
   // 创建新提醒

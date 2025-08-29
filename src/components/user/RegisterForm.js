@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, message } from 'antd';
+import { Form, Input, Button, Card, message, Select } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
+import { userApi } from '../../services/api';
+import universities from '../../data/universities';
 
 const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
@@ -11,16 +13,36 @@ const RegisterForm = () => {
     try {
       setLoading(true);
       
-      // 这里将调用后端API进行注册
-      // const response = await register(values);
+      // 调用后端API进行注册
+      const userData = {
+        username: values.username,
+        email: values.email,
+        password: values.password,
+        university: values.university || '' // 可选字段
+      };
       
-      // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await userApi.register(userData);
       
       message.success('注册成功，请登录');
       navigate('/login');
     } catch (error) {
-      message.error('注册失败，请重试');
+      // 处理不同类型的错误
+      if (error.response) {
+        // 服务器返回了错误状态码
+        const errorMsg = error.response.data?.detail || '注册失败，请重试';
+        message.error(errorMsg);
+        
+        // 处理特定错误
+        if (error.response.status === 400) {
+          if (errorMsg.includes('用户名已被注册')) {
+            message.warning('该用户名已被注册，请更换用户名');
+          } else if (errorMsg.includes('邮箱已被注册')) {
+            message.warning('该邮箱已被注册，请更换邮箱');
+          }
+        }
+      } else {
+        message.error('注册失败，请检查网络连接');
+      }
       console.error('注册失败:', error);
     } finally {
       setLoading(false);
@@ -59,6 +81,24 @@ const RegisterForm = () => {
           <Input 
             prefix={<MailOutlined />} 
             placeholder="邮箱" 
+          />
+        </Form.Item>
+        
+        <Form.Item
+          name="university"
+          rules={[
+            { max: 50, message: '学校名称过长' }
+          ]}
+        >
+          <Select
+            showSearch
+            placeholder="选择你的学校（选填）"
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+            }
+            options={universities}
+            allowClear
           />
         </Form.Item>
 

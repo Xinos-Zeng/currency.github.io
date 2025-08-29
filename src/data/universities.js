@@ -1,0 +1,36 @@
+// 中国主要大学列表
+const universities = [
+  { value: '北京大学', label: '北京大学' },
+  { value: '清华大学', label: '清华大学' },
+  { value: '复旦大学', label: '复旦大学' },
+  { value: '上海交通大学', label: '上海交通大学' },
+  { value: '浙江大学', label: '浙江大学' },
+  { value: '南京大学', label: '南京大学' },
+  { value: '中国人民大学', label: '中国人民大学' },
+  { value: '武汉大学', label: '武汉大学' },
+  { value: '中山大学', label: '中山大学' },
+  { value: '华中科技大学', label: '华中科技大学' },
+  { value: '四川大学', label: '四川大学' },
+  { value: '南开大学', label: '南开大学' },
+  { value: '天津大学', label: '天津大学' },
+  { value: '北京师范大学', label: '北京师范大学' },
+  { value: '山东大学', label: '山东大学' },
+  { value: '厦门大学', label: '厦门大学' },
+  { value: '同济大学', label: '同济大学' },
+  { value: '哈尔滨工业大学', label: '哈尔滨工业大学' },
+  { value: '西安交通大学', label: '西安交通大学' },
+  { value: '东南大学', label: '东南大学' },
+  { value: '中国科学技术大学', label: '中国科学技术大学' },
+  { value: '北京航空航天大学', label: '北京航空航天大学' },
+  { value: '吉林大学', label: '吉林大学' },
+  { value: '华东师范大学', label: '华东师范大学' },
+  { value: '电子科技大学', label: '电子科技大学' },
+  { value: '重庆大学', label: '重庆大学' },
+  { value: '湖南大学', label: '湖南大学' },
+  { value: '西北工业大学', label: '西北工业大学' },
+  { value: '中南大学', label: '中南大学' },
+  { value: '大连理工大学', label: '大连理工大学' },
+  { value: '其他', label: '其他' }
+];
+
+export default universities;

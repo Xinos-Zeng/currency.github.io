@@ -1,50 +1,61 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { Layout, ConfigProvider } from 'antd';
-import zhCN from 'antd/locale/zh_CN';
-
+import { Layout } from 'antd';
 import './App.css';
 
-// 导入布局组件
-import AppHeader from './components/layout/Header';
-import AppFooter from './components/layout/Footer';
-import Sidebar from './components/layout/Sidebar';
-
 // 导入页面组件
-import Dashboard from './pages/Dashboard';
-import TrendAnalysis from './pages/TrendAnalysis';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import HomePage from './pages/HomePage';
+import LoginForm from './components/user/LoginForm';
+import RegisterForm from './components/user/RegisterForm';
 import UserCenter from './pages/UserCenter';
-import AlertSettings from './pages/AlertSettings';
-import AlertHistory from './pages/AlertHistory';
+import AlertsPage from './pages/AlertsPage';
+import CreateAlertPage from './pages/CreateAlertPage';
+import EditAlertPage from './pages/EditAlertPage';
+import AlertHistoryPage from './pages/AlertHistoryPage';
+import NotFound from './pages/NotFound';
+import UnderConstruction from './pages/UnderConstruction';
+
+// 导入布局组件
+import AppHeader from './components/layout/AppHeader';
+import AppFooter from './components/layout/AppFooter';
+import AppSider from './components/layout/AppSider';
 
 const { Content } = Layout;
 
 function App() {
   return (
-    <ConfigProvider locale={zhCN}>
-      <Layout style={{ minHeight: '100vh' }}>
-        <AppHeader />
-        <Layout>
-          <Sidebar />
-          <Layout className="site-layout">
-            <Content className="site-content">
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/trend-analysis" element={<TrendAnalysis />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/user-center" element={<UserCenter />} />
-                <Route path="/alert-settings" element={<AlertSettings />} />
-                <Route path="/alert-history" element={<AlertHistory />} />
-              </Routes>
-            </Content>
-            <AppFooter />
-          </Layout>
+    <Layout style={{ minHeight: '100vh' }}>
+      <AppHeader />
+      <Layout>
+        <AppSider />
+        <Layout style={{ padding: '0 24px 24px' }}>
+          <Content
+            className="site-layout-background"
+            style={{
+              padding: 24,
+              margin: '16px 0',
+              minHeight: 280,
+            }}
+          >
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginForm />} />
+              <Route path="/register" element={<RegisterForm />} />
+              <Route path="/user" element={<UserCenter />} />
+              <Route path="/alerts" element={<AlertsPage />} />
+              <Route path="/alerts/create" element={<CreateAlertPage />} />
+              <Route path="/alerts/history" element={<AlertHistoryPage />} />
+              <Route path="/alerts/:alertId/edit" element={<EditAlertPage />} />
+              <Route path="/rates" element={<UnderConstruction />} />
+              <Route path="/converter" element={<UnderConstruction />} />
+              <Route path="/settings" element={<NotFound />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Content>
+          <AppFooter />
         </Layout>
       </Layout>
-    </ConfigProvider>
+    </Layout>
   );
 }
 

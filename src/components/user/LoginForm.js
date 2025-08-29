@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input, Button, Checkbox, Card, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
+import { userApi } from '../../services/api';
 
 const LoginForm = () => {
   const [loading, setLoading] = useState(false);
@@ -11,27 +12,51 @@ const LoginForm = () => {
     try {
       setLoading(true);
       
-      // 这里将调用后端API进行登录验证
-      // const response = await login(values.username, values.password);
+      // 调用后端API进行登录验证
+      const response = await userApi.login(values.username, values.password);
       
-      // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // 登录成功，获取用户信息
+      const token = response.access_token;
       
-      // 模拟登录成功
-      const mockUserInfo = {
-        id: '1',
+      // 先保存token
+      const userInfo = {
         username: values.username,
-        email: `${values.username}@example.com`,
-        token: 'mock-jwt-token'
+        token: token
       };
       
-      // 保存用户信息到本地存储
-      localStorage.setItem('userInfo', JSON.stringify(mockUserInfo));
+      localStorage.setItem('userInfo', JSON.stringify(userInfo));
+      
+      try {
+        // 获取用户详细信息
+        const userProfile = await userApi.getUserInfo();
+        
+        // 更新用户信息
+        const completeUserInfo = {
+          ...userInfo,
+          id: userProfile.id,
+          email: userProfile.email,
+          university: userProfile.university,
+          preferred_currencies: userProfile.preferred_currencies
+        };
+        
+        localStorage.setItem('userInfo', JSON.stringify(completeUserInfo));
+      } catch (profileError) {
+        console.error('获取用户信息失败:', profileError);
+        // 即使获取用户信息失败，仍然允许用户登录，因为已经有了token
+      }
       
       message.success('登录成功');
       navigate('/');
     } catch (error) {
-      message.error('登录失败，请检查用户名和密码');
+      if (error.response) {
+        if (error.response.status === 401) {
+          message.error('用户名或密码错误');
+        } else {
+          message.error('登录失败: ' + (error.response.data?.detail || '请稍后重试'));
+        }
+      } else {
+        message.error('登录失败，请检查网络连接');
+      }
       console.error('登录失败:', error);
     } finally {
       setLoading(false);
