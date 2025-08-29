@@ -6,7 +6,6 @@ import {
   UserOutlined,
   GlobalOutlined,
   BellOutlined,
-  SettingOutlined,
 } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
 
