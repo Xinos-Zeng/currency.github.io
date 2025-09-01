@@ -55,10 +55,6 @@ npm run build
 npm run deploy
 ```
 
-## 部署
-
-项目通过GitHub Pages部署，访问地址：https://[您的GitHub用户名].github.io/currency.github.io/
-
 ### 部署步骤
 
 1. 确保已安装gh-pages包：
@@ -76,4 +72,4 @@ npm run deploy
 
 ## 后端API接口
 
-项目中已预留后端API接口，实际使用时需要连接到真实的后端服务。API接口文档见`src/services/api.js`。
+API接口见`src/services/api.js`。

@@ -56,6 +56,11 @@ const AppSider = () => {
         <Menu.Item key="home" icon={<HomeOutlined />}>
           <Link to="/">首页</Link>
         </Menu.Item>
+        {isLoggedIn() && (
+          <Menu.Item key="alerts" icon={<BellOutlined />}>
+            <Link to="/alerts">汇率提醒</Link>
+          </Menu.Item>
+        )}
         <Menu.Item key="rates" icon={<LineChartOutlined />}>
           <Link to="/rates">汇率走势</Link>
         </Menu.Item>
@@ -63,14 +68,9 @@ const AppSider = () => {
           <Link to="/converter">汇率转换</Link>
         </Menu.Item>
         {isLoggedIn() && (
-          <>
-            <Menu.Item key="alerts" icon={<BellOutlined />}>
-              <Link to="/alerts">汇率提醒</Link>
-            </Menu.Item>
-            <Menu.Item key="user" icon={<UserOutlined />}>
-              <Link to="/user">个人中心</Link>
-            </Menu.Item>
-          </>
+          <Menu.Item key="user" icon={<UserOutlined />}>
+            <Link to="/user">个人中心</Link>
+          </Menu.Item>
         )}
 {/* 系统设置暂时隐藏
         <Menu.Item key="settings" icon={<SettingOutlined />}>

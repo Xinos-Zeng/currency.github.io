@@ -51,7 +51,7 @@ const AppHeader = () => {
     <Header className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <div className="logo" style={{ color: 'white', fontSize: '20px', fontWeight: 'bold' }}>
         <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>
-          汇率查询系统
+          汇率小助手
         </Link>
       </div>
       <div>

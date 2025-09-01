@@ -26,6 +26,9 @@ jobs:
 
       - name: Build 🔧
         run: npm run build
+        env:
+          # 使用GitHub Secrets中的环境变量
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
