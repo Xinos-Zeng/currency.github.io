@@ -11,7 +11,8 @@ import {
   message,
   Space,
   Divider,
-  Tooltip
+  Tooltip,
+  Radio
 } from 'antd';
 import { ArrowLeftOutlined, SaveOutlined, BellOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +26,7 @@ const CreateAlertPage = () => {
   const [loading, setLoading] = useState(false);
   const [currencies, setCurrencies] = useState([]);
   const [alertType, setAlertType] = useState('threshold');
+  const [thresholdType, setThresholdType] = useState('above'); // 'above'表示高于阈值，'below'表示低于阈值
   const [currentRate, setCurrentRate] = useState(null);
   const [fetchingRate, setFetchingRate] = useState(false);
   const navigate = useNavigate();
@@ -124,12 +126,24 @@ const CreateAlertPage = () => {
       setLoading(true);
       
       // 构建提醒数据
+      // 如果是阈值提醒，根据阈值类型调整阈值的正负
+      let thresholdValue = values.thresholdValue;
+      if (values.alertType === 'threshold' && thresholdValue !== null && thresholdValue !== undefined) {
+        // 如果是“低于”类型，将阈值变为负数
+        if (values.thresholdType === 'below') {
+          thresholdValue = -Math.abs(thresholdValue);
+        } else {
+          // 如果是“高于”类型，确保阈值为正数
+          thresholdValue = Math.abs(thresholdValue);
+        }
+      }
+      
       const alertData = {
         name: values.name,
         condition: {
           type: values.alertType,
           currency_code: values.currencyCode,
-          threshold_value: values.alertType === 'threshold' ? values.thresholdValue : null,
+          threshold_value: values.alertType === 'threshold' ? thresholdValue : null,
           change_percentage: values.alertType === 'change' ? values.changePercentage : null,
           time_frequency: values.alertType === 'time' ? values.timeFrequency : null
         },
@@ -253,36 +267,56 @@ const CreateAlertPage = () => {
           <Divider orientation="left">提醒条件</Divider>
 
           {alertType === 'threshold' && (
-            <Form.Item
-              name="thresholdValue"
-              label={
-                <span>
-                  阈值
-                  {fetchingRate && <span style={{ marginLeft: 8, fontSize: 12, color: '#1890ff' }}>获取中...</span>}
-                  {currentRate !== null && !fetchingRate && (
-                    <Tooltip title="当前货币的现汇卖出价">
-                      <span style={{ marginLeft: 8, fontSize: 12, color: '#52c41a', fontWeight: 'bold' }}>
-                        (当前汇率: {currentRate})
-                      </span>
-                    </Tooltip>
-                  )}
-                </span>
-              }
-              rules={[{ required: true, message: '请输入阈值' }]}
-            >
-              <InputNumber 
-                placeholder={currentRate !== null ? `当前汇率为 ${currentRate}` : "请输入阈值"} 
-                step={0.01} 
-                style={{ width: '100%' }}
-                formatter={value => `${value}`}
-                parser={value => value.replace(/[^\d.-]/g, '')}
-                addonAfter={currentRate !== null ? 
-                  <Button type="link" size="small" onClick={() => form.setFieldsValue({ thresholdValue: currentRate })}>
-                    使用当前汇率
-                  </Button> : null
+            <>
+              <Form.Item
+                name="thresholdType"
+                label="阈值类型"
+                initialValue="above"
+                rules={[{ required: true, message: '请选择阈值类型' }]}
+                tooltip="选择当汇率高于或低于设定值时触发提醒"
+              >
+                <Radio.Group onChange={e => setThresholdType(e.target.value)}>
+                  <Radio.Button value="above">高于</Radio.Button>
+                  <Radio.Button value="below">低于</Radio.Button>
+                </Radio.Group>
+              </Form.Item>
+              
+              <Form.Item
+                name="thresholdValue"
+                label={
+                  <span>
+                    {thresholdType === 'above' ? '高于阈值' : '低于阈值'}
+                    {fetchingRate && <span style={{ marginLeft: 8, fontSize: 12, color: '#1890ff' }}>获取中...</span>}
+                    {currentRate !== null && !fetchingRate && (
+                      <Tooltip title="当前货币的现汇卖出价">
+                        <span style={{ marginLeft: 8, fontSize: 12, color: '#52c41a', fontWeight: 'bold' }}>
+                          (当前汇率: {currentRate})
+                        </span>
+                      </Tooltip>
+                    )}
+                  </span>
                 }
-              />
-            </Form.Item>
+                rules={[
+                  { required: true, message: '请输入阈值' },
+                  { type: 'number', min: 0, message: '阈值必须大于0' }
+                ]}
+                tooltip="输入一个正数值，系统会根据选择的阈值类型自动处理"
+              >
+                <InputNumber 
+                  placeholder={currentRate !== null ? `当前汇率为 ${currentRate}` : "请输入阈值"} 
+                  step={0.01} 
+                  min={0}
+                  style={{ width: '100%' }}
+                  formatter={value => `${value}`}
+                  parser={value => value.replace(/[^\d.]/g, '')}
+                  addonAfter={currentRate !== null ? 
+                    <Button type="link" size="small" onClick={() => form.setFieldsValue({ thresholdValue: currentRate })}>
+                      使用当前汇率
+                    </Button> : null
+                  }
+                />
+              </Form.Item>
+            </>
           )}
 
           {alertType === 'change' && (
