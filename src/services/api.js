@@ -28,6 +28,11 @@ api.interceptors.request.use(
         localStorage.removeItem('userInfo');
       }
     }
+    
+    // 添加Ngrok跳过警告的头部
+    // 这个头部告诉Ngrok跳过中间警告页面
+    config.headers['Ngrok-Skip-Browser-Warning'] = 'true';
+    
     return config;
   },
   error => {
@@ -38,9 +43,70 @@ api.interceptors.request.use(
 // 响应拦截器
 api.interceptors.response.use(
   response => {
+    // 检查是否是Ngrok中间页面
+    if (typeof response.data === 'string' && 
+        (response.data.includes('You are about to visit') || 
+         response.data.includes('ngrok.com') || 
+         response.data.includes('ERR_NGROK_6024'))) {
+      
+      console.log('检测到Ngrok中间页面，尝试自动处理...');
+      
+      // 从响应中提取实际的API URL
+      const match = response.data.match(/visit\s+([^,]+)/);
+      const ngrokUrl = match ? match[1] : null;
+      
+      if (ngrokUrl) {
+        console.log(`提取到Ngrok URL: ${ngrokUrl}`);
+        
+        // 创建一个新的请求，绕过Ngrok中间页面
+        // 这里我们使用fetch API直接请求，并设置特殊头部
+        return fetch(response.config.url, {
+          method: response.config.method,
+          headers: {
+            ...response.config.headers,
+            'Ngrok-Skip-Browser-Warning': 'true'  // 这个头部告诉Ngrok跳过警告
+          },
+          body: response.config.data
+        })
+        .then(res => res.json())
+        .catch(err => {
+          console.error('绕过Ngrok中间页面失败:', err);
+          throw err;
+        });
+      }
+      
+      // 如果无法提取URL，返回原始响应
+      return response.data;
+    }
+    
+    // 正常响应
     return response.data;
   },
   error => {
+    // 检查错误是否包含Ngrok中间页面
+    if (error.response && 
+        typeof error.response.data === 'string' && 
+        (error.response.data.includes('You are about to visit') || 
+         error.response.data.includes('ngrok.com') || 
+         error.response.data.includes('ERR_NGROK_6024'))) {
+      
+      console.log('错误中检测到Ngrok中间页面，尝试自动处理...');
+      
+      // 重新发送请求，添加特殊头部
+      return axios({
+        ...error.config,
+        headers: {
+          ...error.config.headers,
+          'Ngrok-Skip-Browser-Warning': 'true'  // 这个头部告诉Ngrok跳过警告
+        }
+      })
+      .then(response => response.data)
+      .catch(err => {
+        console.error('绕过Ngrok中间页面失败:', err);
+        throw err;
+      });
+    }
+    
     // 处理401未授权错误
     if (error.response && error.response.status === 401) {
       // 清除用户信息并重定向到登录页
