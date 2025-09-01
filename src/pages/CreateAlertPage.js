@@ -10,7 +10,8 @@ import {
   Switch, 
   message,
   Space,
-  Divider
+  Divider,
+  Tooltip
 } from 'antd';
 import { ArrowLeftOutlined, SaveOutlined, BellOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +25,8 @@ const CreateAlertPage = () => {
   const [loading, setLoading] = useState(false);
   const [currencies, setCurrencies] = useState([]);
   const [alertType, setAlertType] = useState('threshold');
+  const [currentRate, setCurrentRate] = useState(null);
+  const [fetchingRate, setFetchingRate] = useState(false);
   const navigate = useNavigate();
 
   // 获取可用货币列表
@@ -40,6 +43,80 @@ const CreateAlertPage = () => {
 
     fetchCurrencies();
   }, []);
+  
+  // 获取当前货币的现汇卖出价
+  const fetchCurrentRate = async (currencyCode) => {
+    if (!currencyCode || alertType !== 'threshold') return;
+    
+    try {
+      setFetchingRate(true);
+      const ratesData = await currencyApi.getRealTimeRates();
+      
+      // 调试输出API返回的数据结构
+      console.log('API返回的汇率数据:', JSON.stringify(ratesData, null, 2));
+      
+      // 查找选中货币的汇率数据
+      let currencyRate;
+      let cashSellingRate = null;
+      
+      // 检查返回的数据结构
+      if (Array.isArray(ratesData)) {
+        // 如果是数组，使用code字段查找货币
+        currencyRate = ratesData.find(rate => rate.code === currencyCode);
+        if (currencyRate) {
+          cashSellingRate = currencyRate.cash_sell; // 使用cash_sell字段
+        }
+      } else if (typeof ratesData === 'object') {
+        // 如果是对象，可能有不同的结构
+        console.log('尝试从对象中获取汇率数据');
+        
+        // 可能的情况1：对象中有rates数组
+        if (ratesData.rates && Array.isArray(ratesData.rates)) {
+          currencyRate = ratesData.rates.find(rate => rate.code === currencyCode || rate.currency_code === currencyCode);
+          if (currencyRate) {
+            cashSellingRate = currencyRate.cash_sell || currencyRate.cash_selling_rate;
+          }
+        } 
+        // 可能的情况2：对象中直接包含货币代码作为键
+        else if (ratesData[currencyCode]) {
+          currencyRate = ratesData[currencyCode];
+          cashSellingRate = currencyRate.cash_sell || currencyRate.cash_selling_rate;
+        }
+        // 可能的情况3：对象中有data字段
+        else if (ratesData.data) {
+          if (Array.isArray(ratesData.data)) {
+            currencyRate = ratesData.data.find(rate => rate.code === currencyCode || rate.currency_code === currencyCode);
+            if (currencyRate) {
+              cashSellingRate = currencyRate.cash_sell || currencyRate.cash_selling_rate;
+            }
+          } else if (ratesData.data[currencyCode]) {
+            currencyRate = ratesData.data[currencyCode];
+            cashSellingRate = currencyRate.cash_sell || currencyRate.cash_selling_rate;
+          }
+        }
+      }
+      
+      console.log('找到的货币汇率数据:', currencyRate);
+      console.log('现汇卖出价:', cashSellingRate);
+      
+      if (cashSellingRate !== null) {
+        setCurrentRate(cashSellingRate);
+        // 始终更新阈值为当前汇率
+        form.setFieldsValue({ thresholdValue: cashSellingRate });
+        // 显示成功消息
+        message.success(`已获取${currencyCode}当前汇率`);
+      } else {
+        setCurrentRate(null);
+        message.warning(`未找到${currencyCode}的现汇卖出价数据`);
+      }
+    } catch (error) {
+      console.error('获取当前汇率失败:', error);
+      message.error('获取当前汇率失败，请稍后重试');
+      setCurrentRate(null);
+    } finally {
+      setFetchingRate(false);
+    }
+  };
 
   // 处理提交
   const handleSubmit = async (values) => {
@@ -85,6 +162,27 @@ const CreateAlertPage = () => {
       changePercentage: undefined,
       timeFrequency: undefined
     });
+    
+    // 如果切换到阈值提醒，且已选择货币，则获取当前汇率
+    if (value === 'threshold') {
+      const currencyCode = form.getFieldValue('currencyCode');
+      if (currencyCode) {
+        fetchCurrentRate(currencyCode);
+      }
+    } else {
+      // 如果不是阈值提醒，清除当前汇率
+      setCurrentRate(null);
+    }
+  };
+  
+  // 处理货币选择变化
+  const handleCurrencyChange = (value) => {
+    // 如果是阈值提醒，则获取当前汇率
+    if (alertType === 'threshold' && value) {
+      // 清除当前阈值，以便切换货币时能够更新
+      setCurrentRate(null);
+      fetchCurrentRate(value);
+    }
   };
 
   return (
@@ -127,7 +225,11 @@ const CreateAlertPage = () => {
             label="货币"
             rules={[{ required: true, message: '请选择货币' }]}
           >
-            <Select placeholder="选择货币" loading={currencies.length === 0}>
+            <Select 
+              placeholder="选择货币" 
+              loading={currencies.length === 0}
+              onChange={handleCurrencyChange}
+            >
               {currencies.map(currency => (
                 <Option key={currency.code} value={currency.code}>
                   {currency.name} ({currency.code})
@@ -153,15 +255,32 @@ const CreateAlertPage = () => {
           {alertType === 'threshold' && (
             <Form.Item
               name="thresholdValue"
-              label="阈值"
+              label={
+                <span>
+                  阈值
+                  {fetchingRate && <span style={{ marginLeft: 8, fontSize: 12, color: '#1890ff' }}>获取中...</span>}
+                  {currentRate !== null && !fetchingRate && (
+                    <Tooltip title="当前货币的现汇卖出价">
+                      <span style={{ marginLeft: 8, fontSize: 12, color: '#52c41a', fontWeight: 'bold' }}>
+                        (当前汇率: {currentRate})
+                      </span>
+                    </Tooltip>
+                  )}
+                </span>
+              }
               rules={[{ required: true, message: '请输入阈值' }]}
             >
               <InputNumber 
-                placeholder="请输入阈值" 
+                placeholder={currentRate !== null ? `当前汇率为 ${currentRate}` : "请输入阈值"} 
                 step={0.01} 
                 style={{ width: '100%' }}
                 formatter={value => `${value}`}
                 parser={value => value.replace(/[^\d.-]/g, '')}
+                addonAfter={currentRate !== null ? 
+                  <Button type="link" size="small" onClick={() => form.setFieldsValue({ thresholdValue: currentRate })}>
+                    使用当前汇率
+                  </Button> : null
+                }
               />
             </Form.Item>
           )}
