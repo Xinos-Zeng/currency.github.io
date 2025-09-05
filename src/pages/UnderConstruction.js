@@ -7,7 +7,7 @@ const UnderConstruction = () => {
   return (
     <Result
       icon={<ToolOutlined style={{ color: '#1890ff' }} />}
-      title="页面正在开发中"
+      title="页面正在开发中, 请登录后使用汇率提醒功能"
       subTitle="敬请期待"
       extra={
         <Link to="/">
