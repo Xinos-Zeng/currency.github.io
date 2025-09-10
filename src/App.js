@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from 'antd';
 import './App.css';
 
@@ -22,6 +22,31 @@ import AppSider from './components/layout/AppSider';
 
 const { Content } = Layout;
 
+// 创建一个需要登录才能访问的路由组件
+const ProtectedRoute = ({ children }) => {
+  const userInfo = localStorage.getItem('userInfo');
+  let isLoggedIn = false;
+  
+  if (userInfo) {
+    try {
+      const parsedInfo = JSON.parse(userInfo);
+      isLoggedIn = !!parsedInfo.token;
+    } catch (e) {
+      localStorage.removeItem('userInfo');
+    }
+  }
+  
+  // 如果未登录，重定向到登录页面
+  if (!isLoggedIn) {
+    // 保存当前路径
+    const currentPath = window.location.pathname;
+    sessionStorage.setItem('redirectAfterLogin', currentPath);
+    return <Navigate to="/login" />;
+  }
+  
+  return children;
+};
+
 function App() {
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -41,11 +66,31 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginForm />} />
               <Route path="/register" element={<RegisterForm />} />
-              <Route path="/user" element={<UserCenter />} />
-              <Route path="/alerts" element={<AlertsPage />} />
-              <Route path="/alerts/create" element={<CreateAlertPage />} />
-              <Route path="/alerts/history" element={<AlertHistoryPage />} />
-              <Route path="/alerts/:alertId/edit" element={<EditAlertPage />} />
+              <Route path="/user" element={
+                <ProtectedRoute>
+                  <UserCenter />
+                </ProtectedRoute>
+              } />
+              <Route path="/alerts" element={
+                <ProtectedRoute>
+                  <AlertsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/alerts/create" element={
+                <ProtectedRoute>
+                  <CreateAlertPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/alerts/history" element={
+                <ProtectedRoute>
+                  <AlertHistoryPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/alerts/:alertId/edit" element={
+                <ProtectedRoute>
+                  <EditAlertPage />
+                </ProtectedRoute>
+              } />
               <Route path="/rates" element={<UnderConstruction />} />
               <Route path="/converter" element={<UnderConstruction />} />
               <Route path="/settings" element={<NotFound />} />

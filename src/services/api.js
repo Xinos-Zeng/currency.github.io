@@ -109,8 +109,18 @@ api.interceptors.response.use(
     
     // 处理401未授权错误
     if (error.response && error.response.status === 401) {
-      // 清除用户信息并重定向到登录页
+      // 清除用户信息
       localStorage.removeItem('userInfo');
+      
+      // 获取当前路径，以便登录后可以重定向回来
+      const currentPath = window.location.pathname;
+      
+      // 将当前路径存储到sessionStorage，但不存储登录和注册页面
+      if (currentPath !== '/login' && currentPath !== '/register') {
+        sessionStorage.setItem('redirectAfterLogin', currentPath);
+      }
+      
+      // 重定向到登录页
       window.location.href = '/login';
     }
     return Promise.reject(error);

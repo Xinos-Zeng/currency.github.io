@@ -46,7 +46,19 @@ const LoginForm = () => {
       }
       
       message.success('登录成功');
-      navigate('/');
+      
+      // 检查是否有登录前的重定向路径
+      const redirectPath = sessionStorage.getItem('redirectAfterLogin');
+      
+      if (redirectPath) {
+        // 清除存储的路径
+        sessionStorage.removeItem('redirectAfterLogin');
+        // 重定向到之前的页面
+        navigate(redirectPath);
+      } else {
+        // 默认重定向到首页
+        navigate('/');
+      }
     } catch (error) {
       if (error.response) {
         if (error.response.status === 401) {
