@@ -8,16 +8,67 @@ const { Title, Paragraph } = Typography;
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [rates, setRates] = useState([]);
+  const [previousRates, setPreviousRates] = useState({});
   const [error, setError] = useState(null);
 
-  // 获取最新汇率数据
+  // 计算汇率变化率，与scanner.py中的逻辑保持一致
+  const calculateRateChange = (currentRate, previousRate) => {
+    if (!previousRate || !currentRate) return null;
+    
+    // 按照scanner.py中的计算逻辑: (current_rate - previous_day_rate) / previous_day_rate * 100 * 100
+    // 由于汇率是100元人民币兑换的外币数量，所以变化率需要乘以100来调整比例
+    return (currentRate - previousRate) / previousRate * 100;
+  };
+
+  // 获取最新汇率数据和前一天汇率数据
   useEffect(() => {
     const fetchRates = async () => {
       try {
         setLoading(true);
-        const data = await currencyApi.getRealTimeRates();
-        // 确保返回的数据是数组
-        setRates(Array.isArray(data) ? data : []);
+        
+        // 获取最新汇率数据
+        const latestData = await currencyApi.getRealTimeRates();
+        
+        // 获取前一天汇率数据，使用新的API
+        let prevRatesMap = {};
+        
+        try {
+          // 使用新的API获取前一天的汇率数据
+          const prevData = await currencyApi.getPreviousDayRates();
+          
+          if (Array.isArray(prevData)) {
+            // 将前一天汇率数据转换为Map格式，方便查询
+            prevData.forEach(rate => {
+              if (rate.code && rate.spot_buy) {
+                prevRatesMap[rate.code] = rate.spot_buy;
+              }
+            });
+          }
+        } catch (prevErr) {
+          console.error('获取前一天汇率数据失败:', prevErr);
+          // 如果获取前一天数据失败，继续处理最新数据
+        }
+        
+        // 设置前一天汇率数据
+        setPreviousRates(prevRatesMap);
+        
+        // 处理最新汇率数据，计算变化率
+        if (Array.isArray(latestData)) {
+          const processedRates = latestData.map(rate => {
+            const prevRate = prevRatesMap[rate.code];
+            const change = calculateRateChange(rate.spot_buy, prevRate);
+            
+            return {
+              ...rate,
+              change: change !== null ? change : null
+            };
+          });
+          
+          setRates(processedRates);
+        } else {
+          setRates([]);
+        }
+        
         setError(null);
       } catch (err) {
         console.error('获取汇率数据失败:', err);
@@ -76,12 +127,16 @@ const HomePage = () => {
       title: '涨跌',
       key: 'change',
       render: (_, record) => {
-        if (!record.change) return '-';
+        if (record.change === null || record.change === undefined) return '-';
+        
         const isPositive = record.change > 0;
+        const isNegative = record.change < 0;
+        
+        // 涨用红色，跌用绿色
         return (
-          <span style={{ color: isPositive ? '#3f8600' : '#cf1322' }}>
-            {isPositive ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-            {Math.abs(record.change).toFixed(4)}
+          <span style={{ color: isPositive ? '#cf1322' : isNegative ? '#3f8600' : '#000000' }}>
+            {isPositive ? <ArrowUpOutlined /> : isNegative ? <ArrowDownOutlined /> : null}
+            {isPositive || isNegative ? Math.abs(record.change).toFixed(2) + '%' : '-'}
           </span>
         );
       },
@@ -121,8 +176,29 @@ const HomePage = () => {
                   title={`${currency.name} (${currency.code})`}
                   value={currency.spot_buy}
                   precision={4}
-                  valueStyle={{ color: '#3f8600' }}
-                  suffix="CNY"
+                  valueStyle={{ 
+                    color: currency.change > 0 ? '#cf1322' : 
+                           currency.change < 0 ? '#3f8600' : 
+                           '#000000' 
+                  }}
+                  suffix={
+                    <span>
+                      CNY
+                      {currency.change !== null && (
+                        <span style={{ 
+                          marginLeft: 8, 
+                          fontSize: '14px',
+                          color: currency.change > 0 ? '#cf1322' : 
+                                 currency.change < 0 ? '#3f8600' : 
+                                 '#000000'
+                        }}>
+                          {currency.change > 0 ? <ArrowUpOutlined /> : 
+                           currency.change < 0 ? <ArrowDownOutlined /> : null}
+                          {currency.change !== null ? Math.abs(currency.change).toFixed(2) + '%' : ''}
+                        </span>
+                      )}
+                    </span>
+                  }
                 />
               </Card>
             </Col>

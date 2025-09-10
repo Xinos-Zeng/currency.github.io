@@ -3,7 +3,7 @@ import axios from 'axios';
 // 创建axios实例
 const api = axios.create({
   // 后端API地址 - 直接读取环境变量，如果不存在则使用默认值
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/v1',
+  baseURL: process.env.REACT_APP_API_URL || 'https://9ae3e9cdaff3.ngrok-free.app/v1/', // 'http://localhost:8000/v1',
   timeout: parseInt(process.env.REACT_APP_API_TIMEOUT || '10000'),
   headers: {
     'Content-Type': 'application/json'
@@ -137,6 +137,11 @@ export const currencyApi = {
   // 获取实时汇率
   getRealTimeRates: () => {
     return api.get('/rates/latest');
+  },
+  
+  // 获取前一天的汇率数据
+  getPreviousDayRates: () => {
+    return api.get('/rates/previous-day');
   },
   
   // 获取指定货币的历史汇率数据
