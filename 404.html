@@ -4,19 +4,37 @@
   <meta charset="utf-8">
   <title>汇率监控平台</title>
   <script type="text/javascript">
-    // 单页应用的GitHub Pages重定向
-    // 当在GitHub Pages上访问子路由时，刷新页面会404
-    // 此脚本将用户重定向到正确的URL
-    var pathSegmentsToKeep = 1;
-
-    var l = window.location;
-    l.replace(
-      l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-      l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-      l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-      (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-      l.hash
-    );
+    // 检查用户登录状态
+    var userInfo = localStorage.getItem('userInfo');
+    var isLoggedIn = false;
+    var currentPath = window.location.pathname;
+    
+    if (userInfo) {
+      try {
+        var parsedInfo = JSON.parse(userInfo);
+        isLoggedIn = !!parsedInfo.token;
+      } catch (e) {
+        localStorage.removeItem('userInfo');
+      }
+    }
+    
+    // 如果登录已失效，直接重定向到登录页
+    if (!isLoggedIn && currentPath !== '/login' && currentPath !== '/register') {
+      // 保存当前路径，以便登录后可以重定向回来
+      sessionStorage.setItem('redirectAfterLogin', currentPath);
+      window.location.replace('/login');
+    } else {
+      // 正常的SPA重定向逻辑
+      var pathSegmentsToKeep = 1;
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    }
   </script>
 </head>
 <body>
