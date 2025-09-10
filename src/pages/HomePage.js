@@ -8,7 +8,6 @@ const { Title, Paragraph } = Typography;
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [rates, setRates] = useState([]);
-  const [previousRates, setPreviousRates] = useState({});
   const [error, setError] = useState(null);
 
   // 计算汇率变化率，与scanner.py中的逻辑保持一致
@@ -48,9 +47,6 @@ const HomePage = () => {
           console.error('获取前一天汇率数据失败:', prevErr);
           // 如果获取前一天数据失败，继续处理最新数据
         }
-        
-        // 设置前一天汇率数据
-        setPreviousRates(prevRatesMap);
         
         // 处理最新汇率数据，计算变化率
         if (Array.isArray(latestData)) {
