@@ -151,7 +151,7 @@ const HomePage = () => {
 
   return (
     <div>
-      <Title level={2}>外汇汇率实时查询</Title>
+      <Title level={2}>汇率实时查询</Title>
       <Paragraph>
         提供人民币兑主要外币的实时汇率查询、历史走势分析和汇率提醒服务。
       </Paragraph>
@@ -204,7 +204,7 @@ const HomePage = () => {
 
       {/* 所有货币汇率表格 */}
       <Card 
-        title="所有货币汇率"
+        title="所有货币汇率(以100单位外币/人民币)"
         extra={
           Array.isArray(rates) && rates.length > 0 && rates[0].update_time ? 
           <span>更新时间: {new Date(rates[0].update_time).toLocaleString('zh-CN')}</span> : 

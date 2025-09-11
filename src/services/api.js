@@ -3,7 +3,7 @@ import axios from 'axios';
 // 创建axios实例
 const api = axios.create({
   // 后端API地址 - 直接读取环境变量，如果不存在则使用默认值
-  baseURL: process.env.REACT_APP_API_URL ||  'http://localhost:8000/v1',
+  baseURL: process.env.REACT_APP_API_URL || 'https://9ae3e9cdaff3.ngrok-free.app/v1/', // 'http://localhost:8000/v1',
   timeout: parseInt(process.env.REACT_APP_API_TIMEOUT || '10000'),
   headers: {
     'Content-Type': 'application/json'
@@ -13,8 +13,14 @@ const api = axios.create({
 // 请求拦截器
 api.interceptors.request.use(
   config => {
-    // 从localStorage获取token
-    const userInfo = localStorage.getItem('userInfo');
+    // 先从localStorage获取token（长期登录）
+    let userInfo = localStorage.getItem('userInfo');
+    
+    // 如果localStorage中没有，再从sessionStorage获取（会话登录）
+    if (!userInfo) {
+      userInfo = sessionStorage.getItem('userInfo');
+    }
+    
     if (userInfo) {
       try {
         const parsedInfo = JSON.parse(userInfo);
@@ -26,6 +32,7 @@ api.interceptors.request.use(
         console.error('解析用户信息失败:', error);
         // 清除无效的用户信息
         localStorage.removeItem('userInfo');
+        sessionStorage.removeItem('userInfo');
       }
     }
     
@@ -109,8 +116,9 @@ api.interceptors.response.use(
     
     // 处理401未授权错误
     if (error.response && error.response.status === 401) {
-      // 清除用户信息
+      // 清除用户信息（同时清除localStorage和sessionStorage）
       localStorage.removeItem('userInfo');
+      sessionStorage.removeItem('userInfo');
       
       // 获取当前路径，以便登录后可以重定向回来
       const currentPath = window.location.pathname;

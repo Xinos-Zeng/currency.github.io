@@ -21,10 +21,22 @@ const LoginForm = () => {
       // 先保存token
       const userInfo = {
         username: values.username,
-        token: token
+        token: token,
+        remember: values.remember || false // 记录是否选择了"记住我"
       };
       
-      localStorage.setItem('userInfo', JSON.stringify(userInfo));
+      // 根据"记住我"选项决定存储位置
+      if (values.remember) {
+        // 如果选择了"记住我"，存储在localStorage中（长期有效）
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        // 清除可能存在的sessionStorage中的数据
+        sessionStorage.removeItem('userInfo');
+      } else {
+        // 如果没有选择"记住我"，存储在sessionStorage中（会话期间有效）
+        sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+        // 清除可能存在的localStorage中的数据
+        localStorage.removeItem('userInfo');
+      }
       
       try {
         // 获取用户详细信息

@@ -12,6 +12,7 @@ import AlertsPage from './pages/AlertsPage';
 import CreateAlertPage from './pages/CreateAlertPage';
 import EditAlertPage from './pages/EditAlertPage';
 import AlertHistoryPage from './pages/AlertHistoryPage';
+import RatesChartPage from './pages/RatesChartPage';
 import NotFound from './pages/NotFound';
 import UnderConstruction from './pages/UnderConstruction';
 
@@ -24,7 +25,14 @@ const { Content } = Layout;
 
 // 创建一个需要登录才能访问的路由组件
 const ProtectedRoute = ({ children }) => {
-  const userInfo = localStorage.getItem('userInfo');
+  // 先从localStorage获取（长期登录）
+  let userInfo = localStorage.getItem('userInfo');
+  
+  // 如果localStorage中没有，再从sessionStorage获取（会话登录）
+  if (!userInfo) {
+    userInfo = sessionStorage.getItem('userInfo');
+  }
+  
   let isLoggedIn = false;
   
   if (userInfo) {
@@ -32,7 +40,9 @@ const ProtectedRoute = ({ children }) => {
       const parsedInfo = JSON.parse(userInfo);
       isLoggedIn = !!parsedInfo.token;
     } catch (e) {
+      // 清除无效的用户信息
       localStorage.removeItem('userInfo');
+      sessionStorage.removeItem('userInfo');
     }
   }
   
@@ -91,7 +101,7 @@ function App() {
                   <EditAlertPage />
                 </ProtectedRoute>
               } />
-              <Route path="/rates" element={<UnderConstruction />} />
+              <Route path="/rates" element={<RatesChartPage />} />
               <Route path="/converter" element={<UnderConstruction />} />
               <Route path="/settings" element={<NotFound />} />
               <Route path="*" element={<NotFound />} />
