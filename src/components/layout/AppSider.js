@@ -6,6 +6,7 @@ import {
   UserOutlined,
   GlobalOutlined,
   BellOutlined,
+  CommentOutlined,
 } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -25,6 +26,8 @@ const AppSider = () => {
       setSelectedKeys(['rates']);
     } else if (pathname.startsWith('/converter')) {
       setSelectedKeys(['converter']);
+    } else if (pathname.startsWith('/feedback')) {
+      setSelectedKeys(['feedback']);
     } else if (pathname.startsWith('/alerts')) {
       setSelectedKeys(['alerts']);
     } else if (pathname.startsWith('/user')) {
@@ -66,6 +69,9 @@ const AppSider = () => {
         </Menu.Item>
         <Menu.Item key="converter" icon={<GlobalOutlined />}>
           <Link to="/converter">汇率转换</Link>
+        </Menu.Item>
+        <Menu.Item key="feedback" icon={<CommentOutlined />}>
+          <Link to="/feedback">反馈建议</Link>
         </Menu.Item>
         {isLoggedIn() && (
           <Menu.Item key="user" icon={<UserOutlined />}>

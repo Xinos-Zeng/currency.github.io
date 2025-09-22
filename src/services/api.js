@@ -236,4 +236,37 @@ export const alertApi = {
   }
 };
 
+// 反馈相关API
+export const feedbackApi = {
+  // 获取反馈列表
+  getFeedbacks: (params) => {
+    return api.get('/feedback', { params });
+  },
+  
+  // 获取单个反馈详情
+  getFeedback: (feedbackId) => {
+    return api.get(`/feedback/${feedbackId}`);
+  },
+  
+  // 创建新反馈
+  createFeedback: (content) => {
+    return api.post('/feedback', { content });
+  },
+  
+  // 添加回复
+  addReply: (feedbackId, content) => {
+    return api.post(`/feedback/${feedbackId}/reply`, { content });
+  },
+  
+  // 删除反馈
+  deleteFeedback: (feedbackId) => {
+    return api.delete(`/feedback/${feedbackId}`);
+  },
+  
+  // 删除回复
+  deleteReply: (feedbackId, replyId) => {
+    return api.delete(`/feedback/${feedbackId}/reply/${replyId}`);
+  }
+};
+
 export default api;
