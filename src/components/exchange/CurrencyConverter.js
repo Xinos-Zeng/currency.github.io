@@ -4,7 +4,7 @@ import { SwapOutlined } from '@ant-design/icons';
 import CurrencySelector from './CurrencySelector';
 import { currencyApi } from '../../services/api';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const CurrencyConverter = () => {
   // 状态管理
@@ -99,15 +99,6 @@ const CurrencyConverter = () => {
     if (value === '' || /^\d+(\.\d*)?$/.test(value)) {
       setAmount(value);
     }
-  };
-
-  // 获取当前使用的汇率
-  const getCurrentRate = () => {
-    if (!rates || !rates[selectedCurrency]) return null;
-    
-    return mode === 'buy' 
-      ? rates[selectedCurrency].sell  // 买入外币时使用现汇卖出价
-      : rates[selectedCurrency].buy;  // 卖出外币时使用现汇买入价
   };
 
   // 获取汇率说明文本

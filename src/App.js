@@ -15,7 +15,6 @@ import AlertHistoryPage from './pages/AlertHistoryPage';
 import RatesChartPage from './pages/RatesChartPage';
 import CurrencyConverterPage from './pages/CurrencyConverterPage';
 import NotFound from './pages/NotFound';
-import UnderConstruction from './pages/UnderConstruction';
 
 // 导入布局组件
 import AppHeader from './components/layout/AppHeader';
