@@ -13,6 +13,7 @@ import CreateAlertPage from './pages/CreateAlertPage';
 import EditAlertPage from './pages/EditAlertPage';
 import AlertHistoryPage from './pages/AlertHistoryPage';
 import RatesChartPage from './pages/RatesChartPage';
+import CurrencyConverterPage from './pages/CurrencyConverterPage';
 import NotFound from './pages/NotFound';
 import UnderConstruction from './pages/UnderConstruction';
 
@@ -102,7 +103,7 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="/rates" element={<RatesChartPage />} />
-              <Route path="/converter" element={<UnderConstruction />} />
+              <Route path="/converter" element={<CurrencyConverterPage />} />
               <Route path="/settings" element={<NotFound />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
