@@ -56,6 +56,7 @@
 }
 
 @media (max-width: 768px) {
+  /* 布局调整 */
   .site-layout {
     padding: 0 8px;
   }
@@ -67,5 +68,65 @@
   
   .chart-container {
     height: 200px;
+  }
+  
+  /* 头部样式调整 */
+  .header-logo {
+    font-size: 16px;
+    margin: 16px 8px 16px 0;
+  }
+  
+  .header-menu {
+    float: none;
+  }
+  
+  /* 卡片样式调整 */
+  .currency-card {
+    margin-bottom: 8px;
+    border-radius: 4px;
+  }
+  
+  /* 表单元素调整 */
+  .ant-form-item {
+    margin-bottom: 8px;
+  }
+  
+  /* 表格调整 */
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px;
+  }
+  
+  /* 按钮组调整 */
+  .ant-btn-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .ant-btn-group > .ant-btn {
+    margin-bottom: 4px;
+    border-radius: 2px !important;
+  }
+  
+  /* 标签页调整 */
+  .ant-tabs-tab {
+    margin: 0 4px 0 0;
+    padding: 8px 12px;
+  }
+  
+  /* 弹出框调整 */
+  .ant-modal {
+    max-width: calc(100vw - 16px);
+    margin: 8px auto;
+  }
+  
+  .ant-modal-content {
+    padding: 12px;
+  }
+  
+  /* 下拉菜单调整 */
+  .ant-dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
   }
 }

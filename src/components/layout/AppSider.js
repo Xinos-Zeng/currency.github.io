@@ -12,7 +12,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 const { Sider } = Layout;
 
-const AppSider = () => {
+const AppSider = ({ isMobile }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState(['home']);
   const location = useLocation();
@@ -44,16 +44,27 @@ const AppSider = () => {
 
   return (
     <Sider
-      collapsible
-      collapsed={collapsed}
-      onCollapse={setCollapsed}
+      collapsible={!isMobile}
+      collapsed={isMobile ? false : collapsed}
+      onCollapse={isMobile ? undefined : setCollapsed}
       width={200}
       className="site-layout-background"
+      style={{
+        overflow: 'auto',
+        height: isMobile ? '100%' : undefined,
+        position: isMobile ? 'fixed' : undefined,
+        left: isMobile ? 0 : undefined,
+        zIndex: isMobile ? 1000 : undefined,
+      }}
     >
       <Menu
         mode="inline"
         selectedKeys={selectedKeys}
-        style={{ height: '100%', borderRight: 0 }}
+        style={{ 
+          height: '100%', 
+          borderRight: 0,
+          paddingBottom: isMobile ? '50px' : 0 // 移动端底部留出空间
+        }}
         theme="dark"
       >
         <Menu.Item key="home" icon={<HomeOutlined />}>

@@ -5,6 +5,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* 防止水平滚动 */
+  touch-action: manipulation; /* 优化触摸操作 */
 }
 
 code {
@@ -14,12 +16,59 @@ code {
 
 /* 响应式布局 */
 @media (max-width: 768px) {
+  /* 移动端通用类 */
   .mobile-hidden {
     display: none !important;
   }
   
   .mobile-full-width {
     width: 100% !important;
+  }
+  
+  .mobile-center {
+    text-align: center !important;
+  }
+  
+  .mobile-padding {
+    padding: 8px !important;
+  }
+  
+  .mobile-margin {
+    margin: 8px !important;
+  }
+  
+  .mobile-small-text {
+    font-size: 14px !important;
+  }
+  
+  /* 表单元素适配 */
+  .ant-form-item {
+    margin-bottom: 12px !important;
+  }
+  
+  .ant-form-item-label {
+    padding-bottom: 4px !important;
+  }
+  
+  /* 表格适配 */
+  .ant-table {
+    font-size: 12px !important;
+  }
+  
+  /* 卡片适配 */
+  .ant-card {
+    margin-bottom: 8px !important;
+  }
+  
+  /* 按钮适配 */
+  .ant-btn {
+    padding: 0 8px !important;
+    height: 32px !important;
+  }
+  
+  /* 间距适配 */
+  .ant-space {
+    gap: 4px !important;
   }
 }
 

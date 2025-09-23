@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Layout } from 'antd';
+import { Layout, Drawer } from 'antd';
 import './App.css';
 
 // 导入页面组件
@@ -59,17 +59,55 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [siderVisible, setSiderVisible] = useState(false);
+  
+  // 检测设备类型
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkIsMobile);
+    };
+  }, []);
+
+  // 处理侧边栏显示/隐藏
+  const toggleSider = () => {
+    setSiderVisible(!siderVisible);
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <AppHeader />
+      <AppHeader isMobile={isMobile} toggleSider={toggleSider} />
       <Layout>
-        <AppSider />
-        <Layout style={{ padding: '0 24px 24px' }}>
+        {isMobile ? (
+          <Drawer
+            placement="left"
+            closable={true}
+            onClose={() => setSiderVisible(false)}
+            open={siderVisible}
+            bodyStyle={{ padding: 0 }}
+            width={200}
+          >
+            <AppSider isMobile={isMobile} />
+          </Drawer>
+        ) : (
+          <AppSider isMobile={isMobile} />
+        )}
+        <Layout style={{ 
+          padding: isMobile ? '0 8px 8px' : '0 24px 24px',
+          transition: 'padding 0.3s'
+        }}>
           <Content
             className="site-layout-background"
             style={{
-              padding: 24,
-              margin: '16px 0',
+              padding: isMobile ? 16 : 24,
+              margin: isMobile ? '8px 0' : '16px 0',
               minHeight: 280,
             }}
           >

@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Menu, Button, Dropdown, Space, Avatar, message } from 'antd';
-import { UserOutlined, LogoutOutlined, DownOutlined, LoginOutlined, UserAddOutlined } from '@ant-design/icons';
+import { 
+  UserOutlined, 
+  LogoutOutlined, 
+  DownOutlined, 
+  LoginOutlined, 
+  UserAddOutlined,
+  MenuOutlined
+} from '@ant-design/icons';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const { Header } = Layout;
 
-const AppHeader = () => {
+const AppHeader = ({ isMobile, toggleSider }) => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -48,8 +55,27 @@ const AppHeader = () => {
   );
 
   return (
-    <Header className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <div className="logo" style={{ color: 'white', fontSize: '20px', fontWeight: 'bold' }}>
+    <Header className="header" style={{ 
+      display: 'flex', 
+      justifyContent: 'space-between', 
+      alignItems: 'center',
+      padding: isMobile ? '0 10px' : '0 50px',
+    }}>
+      {isMobile && (
+        <Button 
+          type="text" 
+          icon={<MenuOutlined />} 
+          onClick={toggleSider}
+          style={{ color: 'white', marginRight: '10px' }}
+        />
+      )}
+      <div className="logo" style={{ 
+        color: 'white', 
+        fontSize: isMobile ? '16px' : '20px', 
+        fontWeight: 'bold',
+        flex: isMobile ? '1' : 'none',
+        textAlign: isMobile ? 'center' : 'left'
+      }}>
         <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>
           汇率小助手
         </Link>
@@ -60,19 +86,27 @@ const AppHeader = () => {
             <Button type="text" style={{ color: 'white', padding: '0', height: 'auto' }}>
               <Space>
                 <Avatar icon={<UserOutlined />} />
-                {user.username}
+                {!isMobile && user.username}
                 <DownOutlined />
               </Space>
             </Button>
           </Dropdown>
         ) : (
           <Space>
-            <Button type="primary" icon={<LoginOutlined />} onClick={() => navigate('/login')}>
-              登录
-            </Button>
-            <Button icon={<UserAddOutlined />} onClick={() => navigate('/register')}>
-              注册
-            </Button>
+            {isMobile ? (
+              <Button type="primary" icon={<LoginOutlined />} onClick={() => navigate('/login')} />
+            ) : (
+              <Button type="primary" icon={<LoginOutlined />} onClick={() => navigate('/login')}>
+                登录
+              </Button>
+            )}
+            {isMobile ? (
+              <Button icon={<UserAddOutlined />} onClick={() => navigate('/register')} />
+            ) : (
+              <Button icon={<UserAddOutlined />} onClick={() => navigate('/register')}>
+                注册
+              </Button>
+            )}
           </Space>
         )}
       </div>
