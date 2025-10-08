@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout, Drawer } from 'antd';
 import './App.css';
-import analytics from './services/analytics';
 
 // 导入页面组件
 import HomePage from './pages/HomePage';
