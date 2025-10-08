@@ -6,6 +6,7 @@ import {
 import { UserOutlined, CommentOutlined, DeleteOutlined } from '@ant-design/icons';
 import SimpleComment from '../components/common/SimpleComment';
 import { feedbackApi } from '../services/api';
+import analytics from '../services/analytics';
 
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -85,6 +86,9 @@ const FeedbackPage = () => {
       setSubmitting(true);
       
       await feedbackApi.createFeedback(content);
+      
+      // 记录反馈提交埋点
+      analytics.trackFeedbackSubmission();
       
       message.success('反馈提交成功');
       setContent('');

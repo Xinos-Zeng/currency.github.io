@@ -3,6 +3,7 @@ import { Form, Input, Button, Checkbox, Card, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
 import { userApi } from '../../services/api';
+import analytics from '../../services/analytics';
 
 const LoginForm = () => {
   const [loading, setLoading] = useState(false);
@@ -56,6 +57,9 @@ const LoginForm = () => {
         console.error('获取用户信息失败:', profileError);
         // 即使获取用户信息失败，仍然允许用户登录，因为已经有了token
       }
+      
+      // 记录用户登录埋点
+      analytics.trackUserLogin(values.username);
       
       message.success('登录成功');
       

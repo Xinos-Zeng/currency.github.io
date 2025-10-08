@@ -3,6 +3,7 @@ import { Card, Radio, Input, Typography, Row, Col, Divider, Spin } from 'antd';
 import { SwapOutlined } from '@ant-design/icons';
 import CurrencySelector from './CurrencySelector';
 import { currencyApi } from '../../services/api';
+import analytics from '../../services/analytics';
 
 const { Text } = Typography;
 
@@ -98,6 +99,15 @@ const CurrencyConverter = () => {
     // 只允许输入数字和小数点
     if (value === '' || /^\d+(\.\d*)?$/.test(value)) {
       setAmount(value);
+      
+      // 记录货币转换埋点
+      if (value && !isNaN(parseFloat(value))) {
+        analytics.trackCurrencyConversion(
+          mode === 'buy' ? 'CNY' : selectedCurrency,
+          mode === 'buy' ? selectedCurrency : 'CNY',
+          parseFloat(value)
+        );
+      }
     }
   };
 

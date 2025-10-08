@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout, Drawer } from 'antd';
 import './App.css';
+import analytics from './services/analytics';
 
 // 导入页面组件
 import HomePage from './pages/HomePage';
@@ -74,6 +75,12 @@ function App() {
     return () => {
       window.removeEventListener('resize', checkIsMobile);
     };
+  }, []);
+
+  // 初始化埋点SDK
+  useEffect(() => {
+    // analytics SDK 会在导入时自动初始化
+    console.log('埋点SDK已初始化');
   }, []);
 
   // 处理侧边栏显示/隐藏

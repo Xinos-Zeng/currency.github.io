@@ -269,4 +269,27 @@ export const feedbackApi = {
   }
 };
 
+// 埋点相关API
+export const analyticsApi = {
+  // 记录页面访问
+  trackPageView: (data, headers = {}) => {
+    return api.post('/analytics/track/page-view', data, { headers });
+  },
+  
+  // 记录用户行为
+  trackUserAction: (data, headers = {}) => {
+    return api.post('/analytics/track/user-action', data, { headers });
+  },
+  
+  // 记录错误
+  trackError: (data, headers = {}) => {
+    return api.post('/analytics/track/error', data, { headers });
+  },
+  
+  // 结束会话
+  endSession: (data = {}, headers = {}) => {
+    return api.post('/analytics/session/end', data, { headers });
+  }
+};
+
 export default api;

@@ -4,6 +4,7 @@ import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
 import { userApi } from '../../services/api';
 import universities from '../../data/universities';
+import analytics from '../../services/analytics';
 
 const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
@@ -22,6 +23,9 @@ const RegisterForm = () => {
       };
       
       await userApi.register(userData);
+      
+      // 记录用户注册埋点
+      analytics.trackUserRegister(values.username);
       
       message.success('注册成功，请登录');
       navigate('/login');

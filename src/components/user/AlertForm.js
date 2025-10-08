@@ -9,6 +9,7 @@ import {
   Card,
   message
 } from 'antd';
+import analytics from '../../services/analytics';
 
 const { Option } = Select;
 
@@ -26,6 +27,20 @@ const AlertForm = ({ currencies, onSubmit, initialValues = {} }) => {
       
       // 模拟API调用
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // 记录提醒创建/修改埋点
+      if (initialValues.id) {
+        analytics.trackAlertModification(
+          initialValues.id,
+          values.type,
+          values.currencyCode
+        );
+      } else {
+        analytics.trackAlertCreation(
+          values.type,
+          values.currencyCode
+        );
+      }
       
       message.success('提醒设置成功');
       onSubmit(values);
