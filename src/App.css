@@ -22,6 +22,15 @@
   align-items: center;
 }
 
+/* 固定导航栏样式 */
+.ant-layout-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
 .header-menu {
   float: right;
 }

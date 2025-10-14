@@ -7,6 +7,7 @@ import {
   GlobalOutlined,
   BellOutlined,
   CommentOutlined,
+  DollarOutlined,
 } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -32,6 +33,8 @@ const AppSider = ({ isMobile }) => {
       setSelectedKeys(['alerts']);
     } else if (pathname.startsWith('/user')) {
       setSelectedKeys(['user']);
+    } else if (pathname.startsWith('/exchange-service')) {
+      setSelectedKeys(['exchange-service']);
     } else if (pathname.startsWith('/settings')) {
       setSelectedKeys(['settings']);
     }
@@ -83,6 +86,9 @@ const AppSider = ({ isMobile }) => {
         </Menu.Item>
         <Menu.Item key="feedback" icon={<CommentOutlined />}>
           <Link to="/feedback">反馈建议</Link>
+        </Menu.Item>
+        <Menu.Item key="exchange-service" icon={<DollarOutlined />}>
+          <Link to="/exchange-service">换汇服务</Link>
         </Menu.Item>
         {isLoggedIn() && (
           <Menu.Item key="user" icon={<UserOutlined />}>

@@ -15,6 +15,7 @@ import AlertHistoryPage from './pages/AlertHistoryPage';
 import RatesChartPage from './pages/RatesChartPage';
 import CurrencyConverterPage from './pages/CurrencyConverterPage';
 import FeedbackPage from './pages/FeedbackPage';
+import ExchangeServicePage from './pages/ExchangeServicePage';
 import NotFound from './pages/NotFound';
 
 // 导入布局组件
@@ -149,6 +150,7 @@ function App() {
               <Route path="/rates" element={<RatesChartPage />} />
               <Route path="/converter" element={<CurrencyConverterPage />} />
               <Route path="/feedback" element={<FeedbackPage />} />
+              <Route path="/exchange-service" element={<ExchangeServicePage />} />
               <Route path="/settings" element={<NotFound />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

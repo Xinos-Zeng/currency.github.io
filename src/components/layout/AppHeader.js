@@ -60,6 +60,10 @@ const AppHeader = ({ isMobile, toggleSider }) => {
       justifyContent: 'space-between', 
       alignItems: 'center',
       padding: isMobile ? '0 10px' : '0 50px',
+      position: 'sticky',
+      top: 0,
+      zIndex: 1000,
+      width: '100%',
     }}>
       {isMobile && (
         <Button 

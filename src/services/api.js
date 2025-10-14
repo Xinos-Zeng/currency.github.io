@@ -292,4 +292,16 @@ export const analyticsApi = {
   }
 };
 
+// 第三方汇率服务API
+export const thirdPartyApi = {
+  // 获取Panda汇率
+  getPandaRate: (amount, sourceCurrency, targetCurrency) => {
+    return api.post('/third-party/panda/rate', {
+      amount,
+      sourceCurrency,
+      targetCurrency
+    });
+  }
+};
+
 export default api;
