@@ -82,7 +82,7 @@ const AppSider = ({ isMobile }) => {
           <Link to="/rates">汇率走势</Link>
         </Menu.Item>
         <Menu.Item key="converter" icon={<GlobalOutlined />}>
-          <Link to="/converter">汇率转换</Link>
+          <Link to="/converter">汇率计算器</Link>
         </Menu.Item>
         <Menu.Item key="feedback" icon={<CommentOutlined />}>
           <Link to="/feedback">反馈建议</Link>
