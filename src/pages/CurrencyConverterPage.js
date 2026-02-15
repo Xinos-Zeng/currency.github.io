@@ -8,7 +8,7 @@ const CurrencyConverterPage = () => {
   return (
     <div>
       <div style={{ textAlign: 'center', marginBottom: 24 }}>
-        <Title level={2}>汇率转换计算器</Title>
+        <Title level={2}>汇率计算器</Title>
         <Paragraph>
           使用最新的汇率数据，进行人民币与外币之间的转换计算。支持买入外币和卖出外币两种模式。
         </Paragraph>
