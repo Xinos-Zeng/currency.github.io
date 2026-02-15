@@ -68,8 +68,3 @@ npm run deploy
 ```
 
 3. 或者，推送代码到main分支，GitHub Actions会自动部署
-
-
-## 后端API接口
-
-API接口见`src/services/api.js`。
