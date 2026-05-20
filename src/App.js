@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Layout, Drawer } from 'antd';
 import './App.css';
 
@@ -27,6 +27,7 @@ const { Content } = Layout;
 
 // 创建一个需要登录才能访问的路由组件
 const ProtectedRoute = ({ children }) => {
+  const location = useLocation();
   // 先从localStorage获取（长期登录）
   let userInfo = localStorage.getItem('userInfo');
   
@@ -50,8 +51,8 @@ const ProtectedRoute = ({ children }) => {
   
   // 如果未登录，重定向到登录页面
   if (!isLoggedIn) {
-    // 保存当前路径
-    const currentPath = window.location.pathname;
+    // HashRouter 下只能保存路由内部路径，不能使用 GitHub Pages 的 pathname。
+    const currentPath = `${location.pathname}${location.search}${location.hash}`;
     sessionStorage.setItem('redirectAfterLogin', currentPath);
     return <Navigate to="/login" />;
   }

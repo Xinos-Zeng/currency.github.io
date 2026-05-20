@@ -120,16 +120,13 @@ api.interceptors.response.use(
       localStorage.removeItem('userInfo');
       sessionStorage.removeItem('userInfo');
       
-      // 获取当前路径，以便登录后可以重定向回来
-      const currentPath = window.location.pathname;
+      const currentPath = window.location.hash.replace(/^#/, '') || '/';
       
-      // 将当前路径存储到sessionStorage，但不存储登录和注册页面
+      // 仅在非登录/注册页时才重定向，避免登录页401时页面被强制刷新导致错误提示丢失
       if (currentPath !== '/login' && currentPath !== '/register') {
         sessionStorage.setItem('redirectAfterLogin', currentPath);
+        window.location.hash = '#/login';
       }
-      
-      // 重定向到登录页
-      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

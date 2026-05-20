@@ -66,12 +66,13 @@ const LoginForm = () => {
       // 检查是否有登录前的重定向路径
       const redirectPath = sessionStorage.getItem('redirectAfterLogin');
       
-      if (redirectPath) {
+      if (redirectPath && redirectPath.startsWith('/') && !redirectPath.includes('/currency.github.io')) {
         // 清除存储的路径
         sessionStorage.removeItem('redirectAfterLogin');
         // 重定向到之前的页面
         navigate(redirectPath);
       } else {
+        sessionStorage.removeItem('redirectAfterLogin');
         // 默认重定向到首页
         navigate('/');
       }
